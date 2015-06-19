@@ -2,7 +2,8 @@
   IsClock
   (C) 2015 Richel Bilderbeek
 
-2015-06-14: v.1.0: Initial version
+2015-06-14: v.1.0: Initial version, shows hours divided by minutes
+2015-06-19: v.1.1: Added showing minutes divided by seconds
 
 */
 
@@ -17,7 +18,7 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 const int error_pin = 13;
 
 //Date of release
-const int release_day   =   14;
+const int release_day   =   19;
 const int release_month =    6;
 const int release_year  = 2015;
  
@@ -122,7 +123,7 @@ void loop()
     
     ShowTime(s,m,h);
 
-    //Show time in serial monitor
+    //Show common time in serial monitor
     { 
       const String time_now = String(h) + ":" + String(m) + ":" + String(s);
       Serial.println(time_now);
@@ -143,5 +144,7 @@ void ShowTime(const int secs, const int mins, const int hours)
   #endif // NDEBUG
   lcd.clear();
   lcd.setCursor(0,0);
-  lcd.println(hours / mins);
+  lcd.println(static_cast<double>(hours) / static_cast<double>(mins));
+  lcd.setCursor(0,1);
+  lcd.println(static_cast<double>(mins) / static_cast<double>(secs));
 }
