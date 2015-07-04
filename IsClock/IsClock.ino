@@ -4,6 +4,7 @@
 
 2015-06-14: v.1.0: Initial version, shows hours divided by minutes
 2015-06-19: v.1.1: Added showing minutes divided by seconds
+2015-07-04: v.1.2: Added 16x1 size
 
 */
 
@@ -14,6 +15,10 @@
 #include <Time.h>
 
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+//Width x height in characters
+enum LcdSize { sixteen_chars_one_row, sixteen_chars_two_rows };
+const LcdSize lcd_size = sixteen_chars_one_row;
 
 const int error_pin = 13;
 
@@ -96,12 +101,19 @@ void SetTimeFromSerial()
 void setup()
 {
   pinMode(error_pin, OUTPUT);  
+  switch (lcd_size)
+  {
+    case sixteen_chars_one_row: lcd.begin(16,1); break;
+    case sixteen_chars_two_rows: lcd.begin(16,2); break;
+    default: OnError("Unknown LCD format");
+  }
   Serial.begin(9600); //Cannot be used: chip is used stand-alone
   #ifndef NDEBUG
-  Serial.println("IsClock v. 1.0 (debug version)");
+  Serial.println("IsClock v. 1.2 (debug version)");
   #else //NDEBUG
-  Serial.println("IsClock v. 1.0 (release version)");
+  Serial.println("IsClock v. 1.2 (release version)");
   #endif //NDEBUG
+
   //Set the date to the release data, otherwise the clock may lag to underflow values
   setTime(0,0,0,release_day,release_month,release_year); 
 }
@@ -129,6 +141,8 @@ void loop()
       Serial.println(time_now);
       delay(100);
     }
+    //Show heartbeat
+    digitalWrite(error_pin,!digitalRead(error_pin));
   }
 }
 
@@ -143,8 +157,24 @@ void ShowTime(const int secs, const int mins, const int hours)
   if (secs > 59) { OnError("ShowTime: secs > 59, secs = " + String(secs)); }
   #endif // NDEBUG
   lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.println(static_cast<double>(hours) / static_cast<double>(mins));
-  lcd.setCursor(0,1);
-  lcd.println(static_cast<double>(mins) / static_cast<double>(secs));
+
+  switch (lcd_size)
+  {
+    case sixteen_chars_one_row: 
+      lcd.setCursor(0,0);
+      lcd.print(static_cast<double>(hours) / static_cast<double>(mins));
+      lcd.setCursor(7,0);
+      lcd.print("        ");
+      lcd.setCursor(8,0);
+      lcd.print(static_cast<double>(mins) / static_cast<double>(secs));
+    break;
+    case sixteen_chars_two_rows: 
+      lcd.setCursor(0,0);
+      lcd.println(static_cast<double>(hours) / static_cast<double>(mins));
+      lcd.setCursor(0,1);
+      lcd.println(static_cast<double>(mins) / static_cast<double>(secs));
+    break;
+    default: OnError("Unknown LCD format");
+  }
+
 }
