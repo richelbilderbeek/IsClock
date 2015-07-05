@@ -5,6 +5,7 @@
 2015-06-14: v.1.0: Initial version, shows hours divided by minutes
 2015-06-19: v.1.1: Added showing minutes divided by seconds
 2015-07-04: v.1.2: Added 16x1 size
+2015-07-05: v.1.3: Added more decimals
 
 */
 
@@ -101,19 +102,28 @@ void SetTimeFromSerial()
 void setup()
 {
   pinMode(error_pin, OUTPUT);  
+  Serial.begin(9600); //Cannot be used: chip is used stand-alone
   switch (lcd_size)
   {
-    case sixteen_chars_one_row: lcd.begin(16,1); break;
-    case sixteen_chars_two_rows: lcd.begin(16,2); break;
+    case sixteen_chars_one_row: 
+      lcd.begin(16,1);
+      lcd.setCursor(0,0);
+      lcd.print("IsClock v. 1.2");  
+    break;
+    case sixteen_chars_two_rows: 
+      lcd.begin(16,2);
+      lcd.setCursor(0,0);
+      lcd.print("IsClock v. 1.2");  
+      lcd.setCursor(0,1);
+      #ifndef NDEBUG
+      Serial.println(" debug version ");
+      #else //NDEBUG
+      Serial.println("release version");
+      #endif //NDEBUG
+    break;
     default: OnError("Unknown LCD format");
   }
-  Serial.begin(9600); //Cannot be used: chip is used stand-alone
-  #ifndef NDEBUG
-  Serial.println("IsClock v. 1.2 (debug version)");
-  #else //NDEBUG
-  Serial.println("IsClock v. 1.2 (release version)");
-  #endif //NDEBUG
-
+  delay(1000);
   //Set the date to the release data, otherwise the clock may lag to underflow values
   setTime(0,0,0,release_day,release_month,release_year); 
 }
@@ -142,7 +152,7 @@ void loop()
       delay(100);
     }
     //Show heartbeat
-    digitalWrite(error_pin,!digitalRead(error_pin));
+    digitalWrite(error_pin,s % 2 ? HIGH : LOW);
   }
 }
 
@@ -162,17 +172,31 @@ void ShowTime(const int secs, const int mins, const int hours)
   {
     case sixteen_chars_one_row: 
       lcd.setCursor(0,0);
-      lcd.print(static_cast<double>(hours) / static_cast<double>(mins));
+      if (mins == 0)
+      {
+        lcd.print("       ");
+      }
+      else
+      {
+        lcd.print(static_cast<double>(hours) / static_cast<double>(mins),5);
+      }
       lcd.setCursor(7,0);
       lcd.print("        ");
       lcd.setCursor(8,0);
-      lcd.print(static_cast<double>(mins) / static_cast<double>(secs));
+      if (secs == 0)
+      {
+        lcd.print("       ");
+      }
+      else
+      {   
+        lcd.print(static_cast<double>(mins) / static_cast<double>(secs),5);
+      }
     break;
     case sixteen_chars_two_rows: 
       lcd.setCursor(0,0);
-      lcd.println(static_cast<double>(hours) / static_cast<double>(mins));
+      lcd.println(static_cast<double>(hours) / static_cast<double>(mins),13);
       lcd.setCursor(0,1);
-      lcd.println(static_cast<double>(mins) / static_cast<double>(secs));
+      lcd.println(static_cast<double>(mins) / static_cast<double>(secs),13);
     break;
     default: OnError("Unknown LCD format");
   }
