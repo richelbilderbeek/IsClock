@@ -1,6 +1,6 @@
 [project]
 site_name = "IsClock"
-site_url = "https://richelbilderbeek.github.io/isclock/"
+site_url = "https://richelbilderbeek.github.io/IsClock/"
 repo_url = "https://github.com/richelbilderbeek/IsClock"
 edit_uri = "blob/master/docs/"
 
