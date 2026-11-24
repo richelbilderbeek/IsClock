@@ -1,13 +1,14 @@
 # IsClock
 
-The IsClock is [one of my machines](https://github.com/richelbilderbeek/Machines) that uses Arduino.
-It's a clock that displays the time as the solution of its equation.
+[![Create the Zensical website](https://github.com/richelbilderbeek/IsClock/actions/workflows/create_zensical_website.yaml/badge.svg?branch=master)](https://github.com/richelbilderbeek/IsClock/actions/workflows/create_zensical_website.yaml)
 
-For example `1:02` is displayed as `0.5` as one divided by two equals one half.
+- [Go to the nicely rendered site](https://richelbilderbeek.github.io/isclock/)
 
- * Video's: [YouTube](https://www.youtube.com/watch?v=dvAbXpXpxsw) [download (.avi)](http://richelbilderbeek.nl/is_clock.avi)
+The source of the website is in the [`docs`](docs) folder,
+with the start page at [`docs/README.md`](docs/README.md).
 
-![IsClock](IsClock.jpg)
+To view the website locally, run:
 
-![IsClock from the side](IsClockSide.jpg)
-
+```bash
+./scripts/deploy_zensical_website_locally.sh
+```
